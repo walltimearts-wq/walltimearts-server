@@ -44,3 +44,6 @@ process.on('unhandledRejection', (err) => {
         process.exit(1);
     }
 });
+
+// Export the app so @vercel/node can use it as the serverless handler
+module.exports = app;

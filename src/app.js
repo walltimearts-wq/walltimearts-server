@@ -12,6 +12,15 @@ const app = express();
 // Set security HTTP headers
 app.use(helmet());
 
+// Back-compat: also accept routes called without the /api prefix
+// e.g. /content/home_page is routed to /api/content/home_page
+app.use((req, res, next) => {
+    if (req.path !== '/' && !req.path.startsWith('/api/')) {
+        req.url = `/api${req.url}`;
+    }
+    next();
+});
+
 // Development logging
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
