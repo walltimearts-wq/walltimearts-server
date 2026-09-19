@@ -35,7 +35,7 @@ const allowedOrigins = [
     process.env.CLIENT_URL || 'http://localhost:3000',
     'http://localhost:4173', 'https://linen-bedding-frontend.vercel.app', 'http://192.168.1.17:3000',
     'https://walltimearts.com',
-    'https://www.walltimearts.com'
+    'https://www.walltimearts.com', 'https://walltimearts-client.vercel.app'
 ];
 
 const corsOptions = {
