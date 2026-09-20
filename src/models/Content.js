@@ -54,6 +54,30 @@ const contentSchema = new mongoose.Schema({
     latestAdditions: {
         count: { type: Number, default: 6, max: 20 }
     },
+    // Store-wide theme applied by admin (colors + typography)
+    theme: {
+        preset: { type: String, default: 'default' },
+        isCustom: { type: Boolean, default: false },
+        colors: {
+            primary: { type: String, default: '#2c5f2d' },
+            primaryDark: { type: String, default: '#1e3f1f' },
+            secondary: { type: String, default: '#c8a97e' },
+            accent: { type: String, default: '#e67e22' },
+            background: { type: String, default: '#fdfaf5' },
+            surface: { type: String, default: '#ffffff' },
+            border: { type: String, default: '#e5e0d8' },
+            text: { type: String, default: '#2b2b2b' },
+            textMuted: { type: String, default: '#6b6b6b' },
+            success: { type: String, default: '#2e7d32' },
+            danger: { type: String, default: '#c0392b' }
+        },
+        typography: {
+            fontFamily: { type: String, default: "'Inter', 'Segoe UI', sans-serif" },
+            headingFont: { type: String, default: "'Playfair Display', Georgia, serif" },
+            baseFontSize: { type: String, default: '16px' },
+            borderRadius: { type: String, default: '8px' }
+        }
+    },
     flashSale: {
         enabled: { type: Boolean, default: true },
         endTime: { type: Date },

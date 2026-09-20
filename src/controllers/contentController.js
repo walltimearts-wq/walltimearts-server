@@ -2,6 +2,73 @@ const Content = require('../models/Content');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/apiResponse');
 const { uploadSingleImage, deleteImage } = require('../services/fileUploadService');
+const { themePresets, themePresetIds } = require('../constants/themePresets');
+
+/**
+ * @desc    Get active store theme (merged with preset defaults)
+ * @route   GET /api/content/theme
+ * @access  Public
+ */
+exports.getTheme = asyncHandler(async (req, res) => {
+    let content = await Content.findOne({ identifier: 'home_page' }).select('theme').lean();
+
+    if (!content || !content.theme) {
+        // No theme saved yet -> return the default preset
+        const preset = themePresets[themePresetIds[0]];
+        return res.status(200).json(new ApiResponse(200, {
+            theme: { preset: themePresetIds[0], isCustom: false, ...preset }
+        }, 'Default theme'));
+    }
+
+    res.status(200).json(new ApiResponse(200, { theme: content.theme }, 'Active theme'));
+});
+
+/**
+ * @desc    Get available theme presets for the admin picker
+ * @route   GET /api/content/theme/presets
+ * @access  Private/Admin
+ */
+exports.getThemePresets = asyncHandler(async (req, res) => {
+    res.status(200).json(new ApiResponse(200, { presets: themePresets }, 'Theme presets'));
+});
+
+/**
+ * @desc    Update store theme (applies store-wide)
+ * @route   PUT /api/content/theme
+ * @access  Private/Admin
+ */
+exports.updateTheme = asyncHandler(async (req, res) => {
+    const content = await Content.findOne({ identifier: 'home_page' });
+
+    if (!content) {
+        return res.status(404).json(new ApiResponse(404, null, 'Content document not found. Save content settings first.'));
+    }
+
+    const { preset, isCustom, colors, typography } = req.body;
+
+    // Applying a preset: reset to the preset defaults first, then apply any overrides
+    if (preset) {
+        const presetData = themePresets[preset];
+        if (!presetData) {
+            return res.status(400).json(new ApiResponse(400, null, `Unknown preset. Valid presets: ${themePresetIds.join(', ')}`));
+        }
+        content.theme = {
+            preset,
+            isCustom: isCustom !== undefined ? isCustom : false,
+            colors: { ...presetData.colors },
+            typography: { ...presetData.typography }
+        };
+    }
+
+    // Custom overrides (partial merge so admin can tweak single values)
+    if (colors) content.theme.colors = { ...content.theme.colors, ...colors };
+    if (typography) content.theme.typography = { ...content.theme.typography, ...typography };
+    if (isCustom !== undefined && !preset) content.theme.isCustom = isCustom;
+
+    await content.save();
+
+    res.status(200).json(new ApiResponse(200, { theme: content.theme }, 'Theme applied successfully'));
+});
 
 /**
  * @desc    Get content by identifier
