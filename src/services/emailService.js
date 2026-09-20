@@ -68,6 +68,9 @@ exports.sendVerificationEmail = async (email, verificationToken) => {
         If the button doesn't work, copy and paste this link:<br>
         <a href="${verificationUrl}" style="color:#7C3AED;word-break:break-all;font-size:12px;">${verificationUrl}</a>
       </p>
+      <p style="color:#9ca3af;font-size:12px;text-align:center;margin:16px 0 0;">
+        Can't find this email in your inbox? Please check your <strong>Spam / Junk</strong> folder and mark it as "Not Spam" so you don't miss future emails.
+      </p>
     `;
 
     const mailOptions = {
@@ -169,6 +172,48 @@ exports.sendShippingUpdateEmail = async (email, order) => {
         from: `"${brandName}" <${process.env.EMAIL_USER}>`,
         to: email,
         subject: `Your ${brandName} order has shipped!`,
+        html: emailWrapper(content)
+    };
+    await transporter.sendMail(mailOptions);
+};
+
+/**
+ * @desc    Forward a contact-form message to the admin inbox via SMTP
+ * @param   {Object} contactData - { name, email, subject, message }
+ */
+exports.sendContactEmail = async ({ name, email, subject, message }) => {
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+
+    const escapeHtml = (str = '') =>
+        String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+    const content = `
+      <div style="text-align:center;margin-bottom:32px;">
+        <div style="width:64px;height:64px;background:#fef3c7;border-radius:50%;margin:0 auto 16px;">
+          <span style="font-size:32px;line-height:64px;">📬</span>
+        </div>
+        <h2 style="margin:0 0 8px;color:#111827;font-size:22px;font-weight:700;">New Contact Message</h2>
+        <p style="margin:0;color:#6b7280;font-size:15px;">Someone sent a message through the ${brandName} website contact form.</p>
+      </div>
+      <div style="background:#f9fafb;border-radius:10px;padding:20px;margin:24px 0;">
+        <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p style="margin:0 0 8px;color:#374151;font-size:14px;"><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}" style="color:#7C3AED;">${escapeHtml(email)}</a></p>
+        <p style="margin:0 0 16px;color:#374151;font-size:14px;"><strong>Subject:</strong> ${escapeHtml(subject)}</p>
+        <p style="margin:0;color:#374151;font-size:14px;white-space:pre-wrap;"><strong>Message:</strong><br>${escapeHtml(message)}</p>
+      </div>
+      <p style="color:#6b7280;font-size:13px;text-align:center;">Reply directly to this email to answer ${escapeHtml(name)}.</p>
+    `;
+
+    const mailOptions = {
+        from: `"${brandName} Website" <${process.env.EMAIL_USER}>`,
+        to: adminEmail,
+        replyTo: email,
+        subject: `Contact Form: ${subject} — ${name}`,
         html: emailWrapper(content)
     };
 

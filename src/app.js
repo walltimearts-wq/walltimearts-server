@@ -83,6 +83,7 @@ const testimonialRoutes = require('./routes/testimonial.routes');
 const returnRoutes = require('./routes/return.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const shippingRoutes = require('./routes/shipping.routes');
+const contactRoutes = require('./routes/contact.routes');
 
 // Routes
 console.log('Mounting API Routes...');
@@ -99,6 +100,7 @@ app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/returns', returnRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/shipping', shippingRoutes);
+app.use('/api/contact', contactRoutes);
 
 
 // Handle unhandled routes
