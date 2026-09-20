@@ -3,26 +3,33 @@
  *          The admin can apply a preset as-is or override individual values
  *          to make it custom. Keys of `colors` must match the Content model's
  *          theme.colors schema and themeValidation.js.
+ *
+ *          `default` mirrors the store's original brand (WallTimeArts
+ *          espresso/brass palette) so applying it keeps the current look.
  */
+
+const defaultColors = {
+    primary: '#2B2118',      // Espresso charcoal
+    primaryDark: '#1A130D',
+    secondary: '#A9947A',    // Aged brass taupe
+    accent: '#B7873F',       // Antique brass
+    background: '#F7F1E8',   // Warm ivory
+    surface: '#FFFFFF',
+    border: '#E8DDCF',       // Parchment beige
+    text: '#2B2118',
+    textMuted: '#7A6A58',
+    success: '#2E7D32',
+    danger: '#C0392B',
+    sage: '#9C6B30',         // Burnished brass (interactive highlights)
+    earth: '#5B3C27'         // Walnut brown
+};
 
 const themePresets = {
     default: {
-        name: 'Default Light',
-        colors: {
-            primary: '#2c5f2d',
-            primaryDark: '#1e3f1f',
-            secondary: '#c8a97e',
-            accent: '#e67e22',
-            background: '#fdfaf5',
-            surface: '#ffffff',
-            border: '#e5e0d8',
-            text: '#2b2b2b',
-            textMuted: '#6b6b6b',
-            success: '#2e7d32',
-            danger: '#c0392b'
-        },
+        name: 'Classic (Current Brand)',
+        colors: defaultColors,
         typography: {
-            fontFamily: "'Inter', 'Segoe UI', sans-serif",
+            fontFamily: "'Manrope', Arial, Helvetica, sans-serif",
             headingFont: "'Playfair Display', Georgia, serif",
             baseFontSize: '16px',
             borderRadius: '8px'
@@ -31,20 +38,22 @@ const themePresets = {
     midnight: {
         name: 'Midnight Dark',
         colors: {
-            primary: '#7c6cf0',
-            primaryDark: '#5a4bc4',
-            secondary: '#9aa4b2',
-            accent: '#22d3ee',
-            background: '#0f1420',
-            surface: '#1a2130',
-            border: '#2a3346',
-            text: '#e8eaf0',
-            textMuted: '#9aa4b2',
-            success: '#34d399',
-            danger: '#f87171'
+            primary: '#7C6CF0',
+            primaryDark: '#5A4BC4',
+            secondary: '#9AA4B2',
+            accent: '#22D3EE',
+            background: '#0F1420',
+            surface: '#1A2130',
+            border: '#2A3346',
+            text: '#E8EAF0',
+            textMuted: '#9AA4B2',
+            success: '#34D399',
+            danger: '#F87171',
+            sage: '#818CF8',
+            earth: '#312E81'
         },
         typography: {
-            fontFamily: "'Inter', 'Segoe UI', sans-serif",
+            fontFamily: "'Manrope', Arial, Helvetica, sans-serif",
             headingFont: "'Poppins', 'Segoe UI', sans-serif",
             baseFontSize: '16px',
             borderRadius: '12px'
@@ -53,21 +62,23 @@ const themePresets = {
     forest: {
         name: 'Forest Green',
         colors: {
-            primary: '#1b4332',
-            primaryDark: '#081c15',
-            secondary: '#95d5b2',
-            accent: '#d8a24a',
-            background: '#f4f9f4',
-            surface: '#ffffff',
-            border: '#d3e4d5',
-            text: '#1b2a20',
-            textMuted: '#5c6f61',
-            success: '#2d6a4f',
-            danger: '#bc4749'
+            primary: '#1B4332',
+            primaryDark: '#081C15',
+            secondary: '#95D5B2',
+            accent: '#D8A24A',
+            background: '#F4F9F4',
+            surface: '#FFFFFF',
+            border: '#D3E4D5',
+            text: '#1B2A20',
+            textMuted: '#5C6F61',
+            success: '#2D6A4F',
+            danger: '#BC4749',
+            sage: '#40916C',
+            earth: '#386641'
         },
         typography: {
             fontFamily: "'Nunito', 'Segoe UI', sans-serif",
-            headingFont: "'Merriweather', Georgia, serif",
+            headingFont: "'Playfair Display', Georgia, serif",
             baseFontSize: '16px',
             borderRadius: '10px'
         }
@@ -75,17 +86,19 @@ const themePresets = {
     sunset: {
         name: 'Sunset Warm',
         colors: {
-            primary: '#e2574c',
-            primaryDark: '#b03a31',
-            secondary: '#f4a261',
-            accent: '#e9c46a',
-            background: '#fff8f2',
-            surface: '#ffffff',
-            border: '#f0dfd2',
-            text: '#33272a',
-            textMuted: '#7d6b6f',
-            success: '#43aa8b',
-            danger: '#bc4749'
+            primary: '#E2574C',
+            primaryDark: '#B03A31',
+            secondary: '#F4A261',
+            accent: '#E9C46A',
+            background: '#FFF8F2',
+            surface: '#FFFFFF',
+            border: '#F0DFD2',
+            text: '#33272A',
+            textMuted: '#7D6B6F',
+            success: '#43AA8B',
+            danger: '#BC4749',
+            sage: '#E76F51',
+            earth: '#9C4A2F'
         },
         typography: {
             fontFamily: "'Lato', 'Segoe UI', sans-serif",
@@ -97,21 +110,23 @@ const themePresets = {
     royal: {
         name: 'Royal Luxe',
         colors: {
-            primary: '#4338ca',
-            primaryDark: '#312e81',
-            secondary: '#c9a227',
-            accent: '#e11d48',
-            background: '#faf9ff',
-            surface: '#ffffff',
-            border: '#e2e0f5',
-            text: '#211d33',
-            textMuted: '#6d6887',
-            success: '#15803d',
-            danger: '#be123c'
+            primary: '#4338CA',
+            primaryDark: '#312E81',
+            secondary: '#C9A227',
+            accent: '#E11D48',
+            background: '#FAF9FF',
+            surface: '#FFFFFF',
+            border: '#E2E0F5',
+            text: '#211D33',
+            textMuted: '#6D6887',
+            success: '#15803D',
+            danger: '#BE123C',
+            sage: '#7C3AED',
+            earth: '#4C1D95'
         },
         typography: {
             fontFamily: "'Jost', 'Segoe UI', sans-serif",
-            headingFont: "'Cormorant Garamond', Georgia, serif",
+            headingFont: "'Playfair Display', Georgia, serif",
             baseFontSize: '16px',
             borderRadius: '6px'
         }
@@ -121,15 +136,17 @@ const themePresets = {
         colors: {
             primary: '#111111',
             primaryDark: '#000000',
-            secondary: '#a3a3a3',
-            accent: '#f97316',
-            background: '#ffffff',
-            surface: '#f7f7f7',
-            border: '#e5e5e5',
+            secondary: '#A3A3A3',
+            accent: '#F97316',
+            background: '#FFFFFF',
+            surface: '#F7F7F7',
+            border: '#E5E5E5',
             text: '#171717',
             textMuted: '#737373',
-            success: '#22c55e',
-            danger: '#ef4444'
+            success: '#22C55E',
+            danger: '#EF4444',
+            sage: '#525252',
+            earth: '#262626'
         },
         typography: {
             fontFamily: "'Roboto', Arial, sans-serif",
@@ -142,4 +159,4 @@ const themePresets = {
 
 const themePresetIds = Object.keys(themePresets);
 
-module.exports = { themePresets, themePresetIds };
+module.exports = { themePresets, themePresetIds, defaultColors };

@@ -23,7 +23,9 @@ const colorKeys = {
     text: hexColor,
     textMuted: hexColor,
     success: hexColor,
-    danger: hexColor
+    danger: hexColor,
+    sage: hexColor,
+    earth: hexColor
 };
 
 const typographyKeys = {
