@@ -1,10 +1,22 @@
 const crypto = require('crypto');
+const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
 const ApiResponse = require('../utils/apiResponse');
 const emailService = require('../services/emailService');
 const messages = require('../constants/messages');
+
+// Build the public user object returned alongside auth tokens
+const buildAuthUser = (user) => ({
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    avatar: user.avatar,
+    phone: user.phone,
+    isVerified: user.isVerified
+});
 
 /**
  * @desc    Register user (email + password only)
@@ -95,6 +107,90 @@ exports.login = asyncHandler(async (req, res, next) => {
                     phone: user.phone,
                     isVerified: user.isVerified
                 }
+            },
+            messages.LOGIN_SUCCESS
+        )
+    );
+});
+
+/**
+ * @desc    Login / register with Google (Google Identity Services ID token)
+ * @route   POST /api/auth/google
+ * @access  Public
+ */
+exports.googleLogin = asyncHandler(async (req, res, next) => {
+    const { credential } = req.body;
+
+    if (!credential) {
+        return next(new ApiError(400, 'Google credential is required'));
+    }
+
+    if (!process.env.GOOGLE_CLIENT_ID) {
+        return next(new ApiError(500, 'Google sign-in is not configured on the server'));
+    }
+
+    // Verify the ID token against our Google OAuth client id
+    const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    let payload;
+    try {
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+        payload = ticket.getPayload();
+    } catch (error) {
+        return next(new ApiError(401, 'Invalid or expired Google credential'));
+    }
+
+    const { sub: googleId, email, name, picture } = payload || {};
+
+    if (!email) {
+        return next(new ApiError(400, 'Google account did not return an email address'));
+    }
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+        // Link the Google account to an existing local account
+        if (!user.googleId) {
+            user.googleId = googleId;
+            user.provider = 'google';
+        }
+        // Google has verified ownership of the email
+        if (!user.isVerified) {
+            user.isVerified = true;
+        }
+        if (!user.avatar && picture) {
+            user.avatar = picture;
+        }
+        if (!user.name && name) {
+            user.name = name;
+        }
+    } else {
+        user = new User({
+            name: name || email.split('@')[0],
+            email,
+            googleId,
+            provider: 'google',
+            avatar: picture || null,
+            isVerified: true
+        });
+    }
+
+    // Generate tokens (same shape as the password login flow)
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                accessToken,
+                refreshToken,
+                user: buildAuthUser(user)
             },
             messages.LOGIN_SUCCESS
         )

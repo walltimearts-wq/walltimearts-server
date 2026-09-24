@@ -20,7 +20,10 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please provide a password'],
+        // Password is only required for local accounts; Google users sign in without one
+        required: function () {
+            return !this.googleId;
+        },
         minlength: [6, 'Password must be at least 6 characters'],
         select: false
     },
@@ -31,6 +34,16 @@ const userSchema = new mongoose.Schema({
     avatar: {
         type: String,
         default: null
+    },
+    googleId: {
+        type: String,
+        default: null,
+        index: true
+    },
+    provider: {
+        type: String,
+        enum: ['local', 'google'],
+        default: 'local'
     },
     role: {
         type: String,
@@ -78,6 +91,9 @@ userSchema.methods.generateRefreshToken = function () {
 
 // Match user entered password to hashed password in database
 userSchema.methods.matchPassword = async function (enteredPassword) {
+    if (!this.password) {
+        return false;
+    }
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
